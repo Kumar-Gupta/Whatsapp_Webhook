@@ -2,15 +2,24 @@
 const token = process.env.WHATSAPP_TOKEN;
 
 // Imports dependencies and set up http server
+const mongoose = require("mongoose");
 const request = require("request"),
   express = require("express"),
   body_parser = require("body-parser"),
   axios = require("axios").default,
   app = express().use(body_parser.json()); // creates express http server
   
+// Connecting Mongoose\
+mongoose.connect(process.env.DB_URI, {
+    useNewUrlParser : true,
+    useUnifiedTopology: true
+  })
+  
+  const db = mongoose.connection;
+  db.on('error', (error) => console.log(error));
+  db.once('open', ()=> console.log('Connected to the database!'));
+  
 
-// Sets server port and logs message on success
-app.listen(process.env.PORT || 1337, () => console.log("webhook is listening"));
 
 // Accepts POST requests at /webhook endpoint
 app.post("/webhook", async (req, res) => {
@@ -175,5 +184,8 @@ app.get("/webhook", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.status(200).send("hello World");
+  res.status(200).send("Checkint the host");
 });
+
+// Sets server port and logs message on success
+app.listen(process.env.PORT || 1337, () => console.log("webhook is listening"));
